@@ -7,21 +7,58 @@
 //
 
 import UIKit
+import GGLSignIn
+import GoogleSignIn
+import FBSDKLoginKit
+import IQKeyboardManager
+import Firebase
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate,GIDSignInDelegate{
 
 	var window: UIWindow?
-
-
+	let net = networkResource()
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-		// Override point for customization after application launch.
-		return true
+		//var configureError: NSError?
+		IQKeyboardManager.shared().isEnabled = true
+		IQKeyboardManager.shared().isEnableAutoToolbar = false
+		IQKeyboardManager.shared().shouldShowTextFieldPlaceholder = false
+		IQKeyboardManager.shared().keyboardDistanceFromTextField = 100
+		
+		FIRApp.configure()
+		net.getToken()
+		
+//		GGLContext.sharedInstance().configureWithError(&configureError)
+//		//assert(configureError == nil, "Error configuring Google services: \(configureError)")
+//		GIDSignIn.sharedInstance().delegate = self
+		
+		 FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+		 return true
 	}
+	
 
+	func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+		return FBSDKApplicationDelegate.sharedInstance().application(application, open: url, sourceApplication: sourceApplication, annotation: annotation)
+	}
+	
+	
+	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+		FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+		
+		return GIDSignIn.sharedInstance().handle(url, sourceApplication: options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String, annotation: options[UIApplicationOpenURLOptionsKey.annotation])
+	}
+	
+	
+	func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+		
+	}
+	
+	func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+		
+	}
 	func applicationWillResignActive(_ application: UIApplication) {
-		// Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-		// Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+		FBSDKAppEvents.activateApp()
+
 	}
 
 	func applicationDidEnterBackground(_ application: UIApplication) {
@@ -40,7 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationWillTerminate(_ application: UIApplication) {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
-
 
 }
 
