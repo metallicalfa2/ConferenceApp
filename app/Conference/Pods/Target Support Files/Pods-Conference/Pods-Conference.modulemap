@@ -1,0 +1,6 @@
+framework module Pods_Conference {
+  umbrella header "Pods-Conference-umbrella.h"
+
+  export *
+  module * { export * }
+}
